@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Món Quà Đặc Biệt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- Cấu hình chung --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden; /* Chặn cuộn trang */
+        }
+
+        /* --- Màn hình Chào mừng ban đầu --- */
+        #initial-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fce38a, #f38181);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 100;
+            transition: opacity 1s ease-out;
+        }
+
+        #initial-screen h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            animation: fadeInDown 1s ease-in-out;
+        }
+
+        #initial-screen p {
+            font-size: 1.5rem;
+            color: white;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        #open-gift-button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e96d71;
+            background-color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease-in-out 0.5s;
+            animation-fill-mode: backwards; /* Nút sẽ ẩn trước khi animation bắt đầu */
+        }
+
+        #open-gift-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* --- Màn hình Tấm thiệp quà tặng --- */
+        #card-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.3) 2px, transparent 2px),
+                radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+                radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.3) 2px, transparent 2px),
+                radial-gradient(circle at 60% 70%, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+            display: none; /* Ban đầu sẽ ẩn đi */
+            opacity: 0;
+            transition: opacity 1.5s ease-in;
+            overflow: hidden;
+        }
+
+        /* --- Bìa thiệp sinh nhật --- */
+        .birthday-header {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            transform: none;
+            text-align: left;
+            z-index: 5;
+            max-width: 400px;
+        }
+
+        .birthday-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #ff6b9d;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            animation: slideInLeft 2s ease-out;
+        }
+
+        .birthday-date {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.8rem;
+            color: #e91e63;
+            font-weight: 600;
+            margin: 10px 0;
+            animation: slideInLeft 2s ease-out 0.3s;
+            animation-fill-mode: backwards;
+        }
+
+        .birthday-message {
+            position: absolute;
+            bottom: 5%;
+            right: 5%;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.2rem;
+            color: #ad1457;
+            margin: 0;
+            max-width: 350px;
+            line-height: 1.5;
+            text-align: right;
+            animation: slideInRight 2s ease-out 1s;
+            animation-fill-mode: backwards;
+        }
+
+        .gift-image {
+            position: absolute;
+            max-width: 45%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.25);
+            transition: transform 0.5s ease;
+        }
+
+        .gift-image:hover {
+            transform: scale(1.05) rotate(2deg);
+            z-index: 10;
+        }
+
+        /* Vị trí bó hoa bên trái dưới */
+        #flower-image {
+            bottom: 5%;
+            left: 5%;
+            transform: rotate(-5deg);
+            animation: slideInLeft 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Hiệu ứng lấp lánh cho cả hai ảnh */
+        #flower-image.sparkle {
+            animation: sparkle 2s infinite, slideInLeft 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        #tea-image.sparkle {
+            animation: sparkle 2s infinite, slideInRight 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Vị trí trà sữa bên phải trên */
+        #tea-image {
+            top: 5%;
+            right: 5%;
+            transform: rotate(5deg);
+            animation: slideInRight 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* --- Hiệu ứng Animations --- */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%) rotate(-15deg); opacity: 0; }
+            to { transform: translateX(0) rotate(-5deg); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%) rotate(15deg); opacity: 0; }
+            to { transform: translateX(0) rotate(5deg); opacity: 1; }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { 
+                filter: brightness(1) drop-shadow(0 0 5px rgba(255, 182, 193, 0.6)); 
+                transform: scale(1);
+            }
+            25% { 
+                filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 105, 180, 0.8)); 
+                transform: scale(1.02);
+            }
+            50% { 
+                filter: brightness(1.5) drop-shadow(0 0 20px rgba(255, 20, 147, 1)); 
+                transform: scale(1.05);
+            }
+            75% { 
+                filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 105, 180, 0.8)); 
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* --- Responsive cho điện thoại --- */
+        @media (max-width: 768px) {
+            #initial-screen h1 { font-size: 2.5rem; }
+            #initial-screen p { font-size: 1.2rem; }
+
+            #card-screen {
+                display: none; /* Sẽ được JS bật lên thành flex */
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+                height: auto;
+                min-height: 100%;
+            }
+
+            .birthday-header {
+                position: static;
+                transform: none;
+                order: -1;
+                margin-bottom: 30px;
+            }
+
+            .birthday-title {
+                font-size: 2.5rem;
+            }
+
+            .birthday-date {
+                font-size: 1.4rem;
+            }
+
+            .birthday-message {
+                font-size: 1rem;
+            }
+
+            .gift-image {
+                position: static; /* Bỏ định vị tuyệt đối */
+                max-width: 80%;
+                transform: rotate(0deg) !important; /* Reset xoay ảnh */
+                animation: sparkle 2s infinite !important; /* Giữ hiệu ứng lấp lánh */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Màn hình 1: Lời chúc ban đầu -->
+    <div id="initial-screen">
+        <h1>Chúc Mừng Sinh Nhật Em</h1>
+        <p>29/07/2025</p>
+        <button id="open-gift-button">Nhấn vào đây để xem món quà</button>
+    </div>
+
+    <!-- Màn hình 2: Tấm thiệp quà tặng -->
+    <div id="card-screen">
+        <!-- Bìa thiệp sinh nhật -->
+        <div class="birthday-header">
+            <h1 class="birthday-title">Chúc Mừng Sinh Nhật!</h1>
+            <p class="birthday-date">29/07/2025</p>
+        </div>
+
+        <!-- Lời chúc ở góc phải dưới -->
+        <div class="birthday-message">
+            Chúc em luôn xinh đẹp, hạnh phúc và thành công trong cuộc sống! 🌸🎂
+        </div>
+
+        <!-- Thay "hoa.jpg" bằng tên file ảnh bó hoa của bạn -->
+        <img src="hoa.jpg" alt="Bó hoa lấp lánh" id="flower-image" class="gift-image sparkle">
+
+        <!-- Thay "trasua.jpg" bằng tên file ảnh trà sữa của bạn -->
+        <img src="trasua.jpg" alt="Ly trà sữa" id="tea-image" class="gift-image sparkle">
+    </div>
+
+    <script>
+        // Lấy các phần tử DOM
+        const initialScreen = document.getElementById('initial-screen');
+        const cardScreen = document.getElementById('card-screen');
+        const openGiftButton = document.getElementById('open-gift-button');
+
+        // Bắt sự kiện khi nhấn nút
+        openGiftButton.addEventListener('click', () => {
+            // 1. Làm mờ và ẩn màn hình ban đầu
+            initialScreen.style.opacity = '0';
+
+            // 2. Sau khi animation mờ kết thúc (1 giây), thực hiện các việc còn lại
+            setTimeout(() => {
+                initialScreen.style.display = 'none'; // Ẩn hoàn toàn
+
+                // 3. Hiển thị màn hình thiệp quà tặng
+                // Kiểm tra kích thước màn hình để quyết định dùng display 'block' hay 'flex'
+                if (window.innerWidth <= 768) {
+                    cardScreen.style.display = 'flex';
+                } else {
+                    cardScreen.style.display = 'block';
+                }
+
+                // 4. Làm hiện rõ màn hình thiệp quà
+                setTimeout(() => {
+                    cardScreen.style.opacity = '1';
+                }, 100); // Một khoảng trễ nhỏ để trình duyệt kịp render
+
+            }, 1000); // 1000ms = 1s, khớp với transition trong CSS
+        });
+    </script>
+
+</body>
+</html>
